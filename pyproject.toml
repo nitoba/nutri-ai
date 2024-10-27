@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "nutri-ai"
+version = "0.1.0"
+description = ""
+authors = ["Bruno Alves"]
+license = "MIT"
+readme = "README.md"
+
+[tool.taskipy.tasks]
+lint = 'ruff check .; ruff check . --diff'
+format = 'ruff check . --fix; ruff format .'
+dev = 'PYTHONPATH=$PYTHONPATH:. fastapi dev src/app.py --reload --host 0.0.0.0 --port 3333'
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langchain-groq = "^0.2.0"
+langchain-community = "^0.3.3"
+langchainhub = "^0.1.21"
+langgraph = "^0.2.39"
+langchain-core = "^0.3.13"
+langchain = "^0.3.4"
+pillow = "^11.0.0"
+pyrogram = "^2.0.106"
+
+
+[tool.poetry.group.dev.dependencies]
+taskipy = "^1.14.0"
+ruff = "^0.7.1"
+ipykernel = "^6.29.5"
+
+[tool.ruff]
+line-length = 79
+extend-exclude = ['migrations']
+
+[tool.ruff.lint]
+preview = true
+select = ['I', 'F', 'E', 'W', 'PL', 'PT']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
