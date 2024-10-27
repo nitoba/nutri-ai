@@ -70,12 +70,36 @@ class TelegramBot:
         )
 
         try:
+            # Analisa se o usuário pediu especificamente o PDF
+            pdf_requested = (
+                'enviar pdf' in user_input.lower()
+                or 'enviar plano' in user_input.lower()
+            )
+
+            # Obtenha a resposta do agente
             response = await self.agent.ainvoke(
                 {'messages': ('user', user_input)},
                 {'configurable': {'thread_id': user_id}},
+                debug=True,
             )
             last_message = response['messages'][-1]
-            await response_message.edit_text(last_message.content)
+            print(last_message)
+
+            # Verifica se o PDF foi gerado e ainda não enviado
+            pdf_path = response.get('pdf_path')
+            if pdf_requested and pdf_path and os.path.exists(pdf_path):
+                # Envia o PDF e marca que já foi enviado
+                await client.send_document(
+                    chat_id=message.chat.id,
+                    document=pdf_path,
+                    caption='Aqui está seu plano alimentar em PDF.',
+                )
+                # Atualiza o estado para indicar que o PDF foi enviado
+                response['pdf_sent'] = True
+            else:
+                # Caso contrário, responde com a mensagem de texto do agente
+                await response_message.edit_text(last_message.content)
+
         except Exception as e:
             self.logger.error(
                 f'Erro ao processar mensagem do usuário [{user_id}]: {e}',
